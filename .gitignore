@@ -1,0 +1,8 @@
+/vendor/
+/composer.lock
+/.phpunit.cache/
+/infection.log
+/infection-report.html
+/.idea/
+/.vscode/
+/php.ini
