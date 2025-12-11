@@ -1,0 +1,56 @@
+name: Mutation Testing
+
+on:
+  pull_request:
+    branches:
+      - master
+      - main
+
+jobs:
+  infection:
+    name: Infection Mutation Testing
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 全履歴を取得（git diffのため）
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: xdebug
+          tools: composer
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v3
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Run PHPUnit tests
+        run: ./vendor/bin/phpunit
+
+      - name: Run Infection (changed lines only)
+        run: |
+          ./vendor/bin/infection \
+            --git-diff-lines \
+            --git-diff-base=origin/${{ github.base_ref }} \
+            --min-msi=80 \
+            --min-covered-msi=90 \
+            --logger-github \
+            --threads=max
+
+      - name: Upload Infection log
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: infection-log
+          path: infection.log
