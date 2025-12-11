@@ -35,23 +35,4 @@ class CalculatorTest extends TestCase
             '空配列' => [[], 60, 80, 0, '空配列'],
         ];
     }
-
-    /**
-     * 統計情報を計算する - 基本テスト（不完全なテスト）
-     */
-    public function testCalculateStatsBasic(): void
-    {
-        // 意図的に不十分なテスト: sumのみチェック、境界条件をテストしていない
-        $result = $this->calculator->calculateStats([10, 20, 30]);
-        $this->assertSame(60, $result['sum']);
-    }
-
-    /**
-     * 空配列の場合
-     */
-    public function testCalculateStatsEmpty(): void
-    {
-        $result = $this->calculator->calculateStats([]);
-        $this->assertSame(0, $result['sum']);
-    }
 }
